@@ -1,12 +1,11 @@
-uniform vec2 m_position;
 uniform vec2 resolution;
+uniform vec2 mPosition;
 
 void main() {
-    vec2 uv = gl_FragCoord.xy / resolution;
-    uv.x *= resolution.x / resolution.y;
+  vec2 uv = gl_FragCoord.xy / resolution * 2.0 - 1.0;
+  uv.x *= resolution.x / resolution.y;
 
-    float d_to_uv = distance(m_position, uv);
+  float d = 1.0 - distance(uv, mPosition);
 
-    gl_FragColor = vec4(0.0, d_to_uv, 0.0, 1.0);
+  gl_FragColor = vec4(d, 1.0, 1.0, 1.0);
 }
-

@@ -11,7 +11,7 @@ const height = window.innerHeight;
 <template>
   <TresCanvas window-size clear-color="black">
     <TresOrthographicCamera
-      :args="[-width / 2, width / 2, height / 2, -height / 2, 0, 1000]"
+      :args="[width / -2, width / 2, height / 2, height / -2, 1, 1000]"
       :position="[0, 0, 1]"
     />
 
