@@ -23,6 +23,8 @@ window.addEventListener('mousemove', event => {
   let x = event.pageX / window.innerWidth * 2.0 - 1;
   let y = 1 - event.pageY / window.innerHeight * 2.0;
 
+  x *= width / height;
+
   uniforms.m_position.value.set(x, y)
 })
 </script>
