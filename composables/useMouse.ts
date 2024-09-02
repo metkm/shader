@@ -5,10 +5,12 @@ interface UseMouseOptions {
   onChange?: (x: number, y: number) => void
 }
 
+const ratio = window.innerWidth / window.innerHeight;
+
 export const useMouse = (options?: UseMouseOptions) => {
   const { x: _x, y: _y, ...other } = usePointer();
 
-  const x = computed(() => (_x.value / window.innerWidth))
+  const x = computed(() => (_x.value / window.innerWidth) * ratio)
   const y = computed(() => 1 - _y.value / window.innerHeight)
 
   const coords = new Vector2(0, 0);
