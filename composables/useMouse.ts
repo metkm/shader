@@ -1,11 +1,15 @@
 import { usePointer } from "@vueuse/core";
 import { Vector2 } from "three";
 
-export const useMouse = () => {
+interface UseMouseOptions {
+  onChange?: (x: number, y: number) => void
+}
+
+export const useMouse = (options?: UseMouseOptions) => {
   const { x: _x, y: _y, ...other } = usePointer();
 
-  const x = computed(() => _x.value / window.innerWidth * 2 - 1)
-  const y = computed(() => _y.value / window.innerHeight * 2 - 1)
+  const x = computed(() => (_x.value / window.innerWidth * 2 - 1))
+  const y = computed(() => 1 - _y.value / window.innerHeight * 2)
 
   const coords = new Vector2(0, 0);
   const coordsOld = new Vector2(0, 0);
@@ -19,6 +23,8 @@ export const useMouse = () => {
 
     diff.subVectors(coords, coordsOld);
     force.set(diff.x * 20, diff.y * 20);
+
+    options?.onChange?.(newX, newY)
   });
 
   return {
