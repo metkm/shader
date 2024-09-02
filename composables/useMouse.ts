@@ -8,8 +8,8 @@ interface UseMouseOptions {
 export const useMouse = (options?: UseMouseOptions) => {
   const { x: _x, y: _y, ...other } = usePointer();
 
-  const x = computed(() => (_x.value / window.innerWidth * 2 - 1))
-  const y = computed(() => 1 - _y.value / window.innerHeight * 2)
+  const x = computed(() => (_x.value / window.innerWidth))
+  const y = computed(() => 1 - _y.value / window.innerHeight)
 
   const coords = new Vector2(0, 0);
   const coordsOld = new Vector2(0, 0);

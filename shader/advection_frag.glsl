@@ -4,7 +4,6 @@ uniform vec2 resolution;
 void main() {
   vec2 uv = gl_FragCoord.xy / resolution;
   float ratio = resolution.x / resolution.y;
-  uv.x *= ratio;
 
   vec2 vel = texture2D(vel0, uv).xy;
   vec2 uv2 = uv - vel * 0.014 * ratio;
