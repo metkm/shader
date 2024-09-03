@@ -9,11 +9,13 @@ const height = window.innerHeight;
 </script>
 
 <template>
-  <TresCanvas window-size clear-color="black">
+  <TresCanvas window-size>
     <TresOrthographicCamera
       :args="[width / -2, width / 2, height / 2, height / -2, 1, 1000]"
       :position="[0, 0, 1]"
     />
+
+    <!-- <TresPerspectiveCamera :position="[0, 0, 1]" /> -->
 
     <TheCamera />
   </TresCanvas>

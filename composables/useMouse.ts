@@ -19,6 +19,14 @@ export const useMouse = (options?: UseMouseOptions) => {
   const diff = new Vector2();
   const force = new Vector2();
 
+  const center = new Vector2();
+
+  const cellScaleX = 1 / window.innerWidth;
+  const cellScaleY = 1 / window.innerHeight;
+
+  const cursorSizeX = 100 * cellScaleX;
+  const cursorSizeY = 100 * cellScaleY;
+
   watch([x, y], ([newX, newY], [oldX, oldY]) => {
     coords.set(newX, newY);
     coordsOld.set(oldX, oldY);
@@ -26,7 +34,12 @@ export const useMouse = (options?: UseMouseOptions) => {
     diff.subVectors(coords, coordsOld);
     force.set(diff.x * 20, diff.y * 20);
 
-    options?.onChange?.(newX, newY)
+    center.set(
+      Math.min(Math.max(newX, -1 + cursorSizeX + cellScaleX * 2), 1 - cursorSizeX - cellScaleX * 2),
+      Math.min(Math.max(newY, -1 + cursorSizeY + cellScaleY * 2), 1 - cursorSizeY - cellScaleY * 2),
+    )
+
+    options?.onChange?.(newX, newY);
   });
 
   return {
@@ -35,6 +48,7 @@ export const useMouse = (options?: UseMouseOptions) => {
     coords,
     coordsOld,
     force,
+    center,
     ...other,
   };
 };
