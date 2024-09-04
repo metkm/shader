@@ -1,14 +1,15 @@
 precision highp float;
 
+uniform vec2 force;
+uniform vec2 center;
 uniform vec2 resolution;
 uniform vec2 mPosition;
-uniform vec2 mForce;
 
 void main() {
   vec2 uv = gl_FragCoord.xy / resolution.xy;
-  uv.x *= resolution.x / resolution.y;
 
-  float d = 1.0 - min(1.0, distance(mPosition, uv));
+  float d = 1.0 - min(1.0, distance(uv, mPosition));
+  float res = d * force.x;
 
-  gl_FragColor = vec4(d * mForce, 0.0, 1.0);
+  gl_FragColor = vec4(0.0, res, 0.0, 1.0);
 }

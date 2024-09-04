@@ -15,7 +15,8 @@ const height = window.innerHeight;
       :position="[0, 0, 1]"
     />
 
-    <!-- <TresPerspectiveCamera :position="[0, 0, 1]" /> -->
+    <!-- <TresPerspectiveCamera :position="[0, 0, 1200]" /> -->
+    <!-- <TheControls /> -->
 
     <TheCamera />
   </TresCanvas>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
+  AdditiveBlending,
   FloatType,
   RawShaderMaterial,
-  // RenderTarget,
   Vector2,
   WebGLRenderTarget,
 } from "three";
@@ -10,131 +10,56 @@ import {
 import commonVert from "~/shader/common.vert?raw";
 import mouseVert from "~/shader/mouse.vert?raw";
 
-import velocityFrag from "~/shader/velocity.frag?raw";
-import divergenceFrag from "~/shader/divergence.frag?raw";
-import poissionFrag from "~/shader/poission.frag?raw";
-import pressureFrag from "~/shader/pressure.frag?raw";
 import colorFrag from "~/shader/color.frag?raw";
 import forceFrag from "~/shader/force.frag?raw";
-
-const width = window.innerWidth;
-const height = window.innerHeight;
+import advectionFrag from "~/shader/advection.frag?raw";
 
 const { render } = useLoop();
+const { width, height } = useWindowSize()
 const { force, coords, center } = useMouse();
 
-const velocityTarget0 = new WebGLRenderTarget(width, height, { type: FloatType });
-const velocityTarget1 = new WebGLRenderTarget(width, height, { type: FloatType });
-
-const velocityViscous0 = new WebGLRenderTarget(width, height, { type: FloatType });
-const velocityViscous1 = new WebGLRenderTarget(width, height, { type: FloatType });
-
-const divergenceTarget = new WebGLRenderTarget(width, height, { type: FloatType });
-
-const poissionTarget1 = new WebGLRenderTarget(width, height, { type: FloatType });
-const poissionTarget0 = new WebGLRenderTarget(width, height, { type: FloatType });
+const velocity0 = new WebGLRenderTarget(width.value, height.value, { type: FloatType });
+const velocity1 = new WebGLRenderTarget(width.value, height.value, { type: FloatType });
+const divergence = new WebGLRenderTarget(width.value, height.value, { type: FloatType });
+const pressure0 = new WebGLRenderTarget(width.value, height.value, { type: FloatType });
+const pressure1 = new WebGLRenderTarget(width.value, height.value, { type: FloatType });
 
 let uniforms = {
   mPosition: { value: coords },
   mForce: { value: force },
-
-  resolution: { value: new Vector2(width, height) },
-  cellSize: { value: new Vector2(1 / width, 1 / height) },
   center: { value: center },
 
-  velocity0: { value: velocityTarget0.texture },
-  velocity1: { value: velocityTarget1.texture },
-  
-  velocityViscous0: { value: velocityViscous0.texture },
-  velocityViscous1: { value: velocityViscous1.texture },
+  resolution: { value: new Vector2(width.value, height.value) },
+  px: { value: new Vector2(1 / width.value, 1 / height.value) },
+  dt: { value: 1 / 60 },
 
-  divergence: { value: divergenceTarget.texture },
-
-  poission0: { value: poissionTarget0.texture },
-  poission1: { value: poissionTarget1.texture },
+  velocity0: { value: velocity0.texture },
+  velocity1: { value: velocity1.texture },
 } as RawShaderMaterial['uniforms'];
 
 const {
-  scene: velocityScene,
-  camera: velocityCamera,
+  scene: advectionScene,
+  camera: advectionCamera,
 } = createRenderTarget({
   vertexShader: commonVert,
-  fragmentShader: velocityFrag,
-  uniforms
+  fragmentShader: advectionFrag,
+  uniforms,
 })
 
 const {
-  scene: forceScene,
-  camera: forceCamera,
+  scene: mouseScene,
+  camera: mouseCamera,
 } = createRenderTarget({
   vertexShader: mouseVert,
   fragmentShader: forceFrag,
-  uniforms
-})
-
-const {
-  scene: divergenceScene,
-  camera: divergenceCamera,
-} = createRenderTarget({
-  vertexShader: commonVert,
-  fragmentShader: divergenceFrag,
-  uniforms
-})
-
-const {
-  scene: poissionScene,
-  camera: poissionCamera,
-} = createRenderTarget({
-  vertexShader: commonVert,
-  fragmentShader: poissionFrag,
-  uniforms
-})
-
-const {
-  scene: pressureScene,
-  camera: pressureCamera,
-} = createRenderTarget({
-  vertexShader: commonVert,
-  fragmentShader: pressureFrag,
-  uniforms
+  blending: AdditiveBlending,
+  uniforms,
 })
 
 render(({ renderer, camera, scene }) => {
-  renderer.setRenderTarget(velocityTarget1);
-  renderer.render(velocityScene, velocityCamera);
-
-  // External Force
-  renderer.render(forceScene, forceCamera);
-  // External Force End
-
-  // Divergence
-  renderer.setRenderTarget(divergenceTarget);
-  renderer.render(divergenceScene, divergenceCamera);
-  // Divergence End
-
-  // Poission
-  let targetIn, targetOut;
-  for (let index = 0; index < 32; index++) {
-    if (index % 2 === 0) {
-      targetIn = poissionTarget0;
-      targetOut = poissionTarget1;
-    } else {
-      targetIn = poissionTarget1;
-      targetOut = poissionTarget0;
-    }
-
-    uniforms.poission0.value = targetIn.texture;
-    uniforms.poission1.value = targetOut.texture;
-
-    renderer.setRenderTarget(targetOut);
-    renderer.render(poissionScene, poissionCamera);
-  }
-  // Poission End
-
-  // Pressure
-  renderer.setRenderTarget(velocityTarget0);
-  renderer.render(pressureScene, pressureCamera);
-  // Pressure End
+  renderer.setRenderTarget(velocity1);
+  renderer.render(advectionScene, advectionCamera);
+  renderer.render(mouseScene, mouseCamera);
 
   renderer.setRenderTarget(null);
   renderer.render(scene, camera);
@@ -143,13 +68,10 @@ render(({ renderer, camera, scene }) => {
 
 <template>
   <TresMesh>
-    <!-- <TresPlaneGeometry :args="[width / 2, height /2 ]" /> -->
-
-    <TresPlaneGeometry :args="[1, 1]" />
-
+    <TresPlaneGeometry :args="[width, height]" />
     <TresShaderMaterial
       :vertex-shader="commonVert"
-      :fragment-shader="colorFrag"
+      :fragment-shader="forceFrag"
       :uniforms="uniforms"
     />
   </TresMesh>
