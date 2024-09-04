@@ -27,7 +27,7 @@ const pressure1 = new WebGLRenderTarget(width.value, height.value, { type: Float
 let uniforms = {
   mPosition: { value: coords },
   mForce: { value: force },
-  center: { value: center },
+  ratio: { value: width.value / height.value },
 
   resolution: { value: new Vector2(width.value, height.value) },
   px: { value: new Vector2(1 / width.value, 1 / height.value) },
