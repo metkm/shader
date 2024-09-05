@@ -8,7 +8,6 @@ import {
 } from "three";
 
 import commonVert from "~/shader/common.vert?raw";
-import mouseVert from "~/shader/mouse.vert?raw";
 
 import colorFrag from "~/shader/color.frag?raw";
 import forceFrag from "~/shader/force.frag?raw";
@@ -50,7 +49,7 @@ const {
   scene: mouseScene,
   camera: mouseCamera,
 } = createRenderTarget({
-  vertexShader: mouseVert,
+  vertexShader: commonVert,
   fragmentShader: forceFrag,
   blending: AdditiveBlending,
   uniforms,
