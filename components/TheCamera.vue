@@ -12,6 +12,7 @@ import commonVert from "~/shader/common.vert?raw";
 import colorFrag from "~/shader/color.frag?raw";
 import forceFrag from "~/shader/force.frag?raw";
 import advectionFrag from "~/shader/advection.frag?raw";
+import divergenceFrag from "~/shader/divergence.frag?raw";
 
 const { render } = useLoop();
 const { width, height } = useWindowSize()
@@ -70,7 +71,7 @@ render(({ renderer, camera, scene }) => {
     <TresPlaneGeometry :args="[width, height]" />
     <TresShaderMaterial
       :vertex-shader="commonVert"
-      :fragment-shader="forceFrag"
+      :fragment-shader="divergenceFrag"
       :uniforms="uniforms"
     />
   </TresMesh>
